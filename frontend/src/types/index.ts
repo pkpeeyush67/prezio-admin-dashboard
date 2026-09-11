@@ -28,6 +28,16 @@ export type Customer = {
   updated_at: string
 }
 
+export type CustomerInput = Pick<Customer, 'name' | 'email' | 'company' | 'status'>
+
+export type CustomerActivity = {
+  id: number
+  customer_id: number
+  action: string
+  created_at: string
+  metadata: Record<string, string>
+}
+
 export type CustomerPage = {
   items: Customer[]
   total: number

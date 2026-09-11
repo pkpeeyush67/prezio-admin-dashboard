@@ -9,6 +9,8 @@ A small full-stack assessment project built as a React single-page application w
 - Protected dashboard and logout
 - Total, active, inactive, and last-30-days customer KPIs
 - Customer table with server-side search, status filtering, sorting, and pagination
+- Create, view, edit, and delete customer workflows
+- Customer activity history for create and update events
 - Responsive loading, error, and empty states
 - FastAPI Swagger documentation
 - Backend and frontend tests
@@ -19,7 +21,7 @@ A small full-stack assessment project built as a React single-page application w
 React SPA :3000 → REST API → FastAPI :8000 → SQLAlchemy → SQLite
 ```
 
-The database contains two small tables: `admins` for authentication and `customers` for dashboard data. Sample customers are inserted only when the customer table is empty.
+The database contains three small tables: `admins` for authentication, `customers` for dashboard data, and `customer_activity` for basic audit history. Sample customers are inserted only when the customer table is empty.
 
 ## Run with Docker
 
@@ -99,6 +101,11 @@ npm test
 | GET | `/api/auth/me` | Validate the current session |
 | GET | `/api/dashboard/stats` | Return the four customer KPIs |
 | GET | `/api/customers` | Search, filter, sort, and paginate customers |
+| GET | `/api/customers/{id}` | Return customer details |
+| POST | `/api/customers` | Create a customer |
+| PUT | `/api/customers/{id}` | Update a customer |
+| DELETE | `/api/customers/{id}` | Delete a customer |
+| GET | `/api/customers/{id}/activity` | Return customer activity history |
 
 ## Design decisions
 

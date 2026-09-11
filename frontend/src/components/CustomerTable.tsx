@@ -6,13 +6,16 @@ type Props = {
   sortBy: SortField
   sortOrder: SortOrder
   onSort: (field: SortField) => void
+  onView: (customer: Customer) => void
+  onEdit: (customer: Customer) => void
+  onDelete: (customer: Customer) => void
 }
 
 const dateFormat = new Intl.DateTimeFormat('en-IN', {
   day: '2-digit', month: 'short', year: 'numeric',
 })
 
-export function CustomerTable({ customers, loading, sortBy, sortOrder, onSort }: Props) {
+export function CustomerTable({ customers, loading, sortBy, sortOrder, onSort, onView, onEdit, onDelete }: Props) {
   function heading(label: string, field: SortField) {
     const direction = sortBy === field ? (sortOrder === 'asc' ? ' ↑' : ' ↓') : ''
     return <button className="sort-button" onClick={() => onSort(field)}>{label}{direction}</button>
@@ -35,6 +38,7 @@ export function CustomerTable({ customers, loading, sortBy, sortOrder, onSort }:
           <th>{heading('Status', 'status')}</th>
           <th>{heading('Created', 'created_at')}</th>
           <th>{heading('Updated', 'updated_at')}</th>
+          <th>Actions</th>
         </tr></thead>
         <tbody>
           {customers.map((customer) => (
@@ -45,6 +49,7 @@ export function CustomerTable({ customers, loading, sortBy, sortOrder, onSort }:
               <td><span className={`status ${customer.status}`}>{customer.status}</span></td>
               <td>{dateFormat.format(new Date(customer.created_at))}</td>
               <td>{dateFormat.format(new Date(customer.updated_at))}</td>
+              <td><div className="row-actions"><button onClick={() => onView(customer)}>View</button><button onClick={() => onEdit(customer)}>Edit</button><button className="delete-link" onClick={() => onDelete(customer)}>Delete</button></div></td>
             </tr>
           ))}
         </tbody>

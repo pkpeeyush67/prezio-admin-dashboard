@@ -42,6 +42,27 @@ class CustomerResponse(BaseModel):
     updated_at: datetime
 
 
+class CustomerCreate(BaseModel):
+    name: str = Field(min_length=2, max_length=100)
+    email: EmailStr
+    company: str = Field(min_length=2, max_length=150)
+    status: Literal["active", "inactive"] = "active"
+
+
+class CustomerUpdate(CustomerCreate):
+    pass
+
+
+class CustomerActivityResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    customer_id: int
+    action: str
+    created_at: datetime
+    metadata: dict = Field(validation_alias="activity_metadata")
+
+
 class CustomerListResponse(BaseModel):
     items: list[CustomerResponse]
     total: int

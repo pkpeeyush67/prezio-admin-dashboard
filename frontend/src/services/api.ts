@@ -1,5 +1,8 @@
 import type {
   Admin,
+  Customer,
+  CustomerActivity,
+  CustomerInput,
   CustomerPage,
   DashboardStats,
   LoginResult,
@@ -25,6 +28,7 @@ async function request<T>(path: string, options: RequestInit = {}, token?: strin
     throw new Error(detail)
   }
 
+  if (response.status === 204) return undefined as T
   return response.json() as Promise<T>
 }
 
@@ -65,4 +69,18 @@ export const api = {
     if (params.status) query.set('status', params.status)
     return request<CustomerPage>(`/customers?${query}`, {}, token)
   },
+
+  customer: (token: string, id: number) => request<Customer>(`/customers/${id}`, {}, token),
+
+  activity: (token: string, id: number) =>
+    request<CustomerActivity[]>(`/customers/${id}/activity`, {}, token),
+
+  createCustomer: (token: string, customer: CustomerInput) =>
+    request<Customer>('/customers', { method: 'POST', body: JSON.stringify(customer) }, token),
+
+  updateCustomer: (token: string, id: number, customer: CustomerInput) =>
+    request<Customer>(`/customers/${id}`, { method: 'PUT', body: JSON.stringify(customer) }, token),
+
+  deleteCustomer: (token: string, id: number) =>
+    request<void>(`/customers/${id}`, { method: 'DELETE' }, token),
 }
