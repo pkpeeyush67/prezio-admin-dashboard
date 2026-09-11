@@ -1,55 +1,47 @@
-import type { Customer, SortField, SortOrder } from '../types'
+import type { ManagedUser } from '../types'
 
 type Props = {
-  customers: Customer[]
+  users: ManagedUser[]
   loading: boolean
-  sortBy: SortField
-  sortOrder: SortOrder
-  onSort: (field: SortField) => void
-  onView: (customer: Customer) => void
-  onEdit: (customer: Customer) => void
-  onDelete: (customer: Customer) => void
+  onView: (user: ManagedUser) => void
+  onEdit: (user: ManagedUser) => void
+  onDelete: (user: ManagedUser) => void
 }
 
 const dateFormat = new Intl.DateTimeFormat('en-IN', {
   day: '2-digit', month: 'short', year: 'numeric',
 })
 
-export function CustomerTable({ customers, loading, sortBy, sortOrder, onSort, onView, onEdit, onDelete }: Props) {
-  function heading(label: string, field: SortField) {
-    const direction = sortBy === field ? (sortOrder === 'asc' ? ' ↑' : ' ↓') : ''
-    return <button className="sort-button" onClick={() => onSort(field)}>{label}{direction}</button>
-  }
-
+export function UserTable({ users, loading, onView, onEdit, onDelete }: Props) {
   if (loading) {
-    return <div className="table-state"><span className="spinner" /> Loading customers…</div>
+    return <div className="table-state"><span className="spinner" /> Loading users…</div>
   }
-  if (customers.length === 0) {
-    return <div className="table-state"><strong>No customers found</strong><span>Try changing your search or status filter.</span></div>
+  if (users.length === 0) {
+    return <div className="table-state"><strong>No users found</strong><span>Add a user or upload a CSV dataset.</span></div>
   }
 
   return (
     <div className="table-scroll">
       <table>
         <thead><tr>
-          <th>{heading('Customer ID', 'id')}</th>
-          <th>{heading('Customer', 'name')}</th>
-          <th>{heading('Company', 'company')}</th>
-          <th>{heading('Status', 'status')}</th>
-          <th>{heading('Created', 'created_at')}</th>
-          <th>{heading('Updated', 'updated_at')}</th>
+          <th>User ID</th>
+          <th>User</th>
+          <th>Company</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th>Updated</th>
           <th>Actions</th>
         </tr></thead>
         <tbody>
-          {customers.map((customer) => (
-            <tr key={customer.id}>
-              <td className="customer-id">#{String(customer.id).padStart(4, '0')}</td>
-              <td><div className="customer-cell"><span>{customer.name.charAt(0)}</span><div><strong>{customer.name}</strong><small>{customer.email}</small></div></div></td>
-              <td>{customer.company}</td>
-              <td><span className={`status ${customer.status}`}>{customer.status}</span></td>
-              <td>{dateFormat.format(new Date(customer.created_at))}</td>
-              <td>{dateFormat.format(new Date(customer.updated_at))}</td>
-              <td><div className="row-actions"><button onClick={() => onView(customer)}>View</button><button onClick={() => onEdit(customer)}>Edit</button><button className="delete-link" onClick={() => onDelete(customer)}>Delete</button></div></td>
+          {users.map((user) => (
+            <tr key={user.id}>
+              <td className="customer-id">#{String(user.id).padStart(4, '0')}</td>
+              <td><div className="customer-cell"><span>{user.name.charAt(0)}</span><div><strong>{user.name}</strong><small>{user.email}</small></div></div></td>
+              <td>{user.company}</td>
+              <td><span className={`status ${user.status}`}>{user.status}</span></td>
+              <td>{dateFormat.format(new Date(user.created_at))}</td>
+              <td>{dateFormat.format(new Date(user.updated_at))}</td>
+              <td><div className="row-actions"><button onClick={() => onView(user)}>View</button><button onClick={() => onEdit(user)}>Edit</button><button className="delete-link" onClick={() => onDelete(user)}>Delete</button></div></td>
             </tr>
           ))}
         </tbody>

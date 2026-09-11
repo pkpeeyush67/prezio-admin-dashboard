@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..dependencies import get_current_admin
-from ..models import Admin, Customer
+from ..models import Admin, ManagedUser
 from ..schemas import DashboardStatsResponse
 
 router = APIRouter(prefix="/api/dashboard", tags=["Dashboard"])
@@ -18,13 +18,13 @@ def get_stats(
     database: Session = Depends(get_db),
 ) -> DashboardStatsResponse:
     def count(*conditions) -> int:
-        statement = select(func.count()).select_from(Customer).where(*conditions)
+        statement = select(func.count()).select_from(ManagedUser).where(*conditions)
         return database.scalar(statement) or 0
 
     thirty_days_ago = datetime.utcnow() - timedelta(days=30)
     return DashboardStatsResponse(
-        total_customers=count(),
-        active_customers=count(Customer.status == "active"),
-        inactive_customers=count(Customer.status == "inactive"),
-        added_last_30_days=count(Customer.created_at >= thirty_days_ago),
+        total_users=count(),
+        active_users=count(ManagedUser.status == "active"),
+        inactive_users=count(ManagedUser.status == "inactive"),
+        added_last_30_days=count(ManagedUser.created_at >= thirty_days_ago),
     )

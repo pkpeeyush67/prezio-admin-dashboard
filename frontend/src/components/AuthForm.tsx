@@ -52,9 +52,9 @@ export function AuthForm({ mode, onSubmit, onSwitch }: Props) {
           <span>P</span> Prezio
         </a>
         <div>
-          <p className="overline">CUSTOMER OPERATIONS</p>
-          <h1>Clarity for every customer decision.</h1>
-          <p>Monitor customer health and activity from one calm, focused workspace.</p>
+          <p className="overline">USER OPERATIONS</p>
+          <h1>Simple, confident user management.</h1>
+          <p>Manage accounts and monitor user activity from one focused workspace.</p>
           <div className="trust-line">
             <span>✓</span> Secure access &nbsp;·&nbsp; Live metrics &nbsp;·&nbsp; Fast search
           </div>

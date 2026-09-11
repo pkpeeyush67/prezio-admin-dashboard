@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import DateTime, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column
 
 from .database import Base
 
@@ -18,8 +18,8 @@ class Admin(Base):
     )
 
 
-class Customer(Base):
-    __tablename__ = "customers"
+class ManagedUser(Base):
+    __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
@@ -32,21 +32,3 @@ class Customer(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
     )
-    activities: Mapped[list["CustomerActivity"]] = relationship(
-        back_populates="customer", cascade="all, delete-orphan"
-    )
-
-
-class CustomerActivity(Base):
-    __tablename__ = "customer_activity"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    customer_id: Mapped[int] = mapped_column(
-        ForeignKey("customers.id", ondelete="CASCADE"), nullable=False, index=True
-    )
-    action: Mapped[str] = mapped_column(String(30), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False, index=True
-    )
-    activity_metadata: Mapped[dict] = mapped_column("metadata", JSON, default=dict)
-    customer: Mapped[Customer] = relationship(back_populates="activities")

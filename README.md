@@ -1,96 +1,79 @@
-# Prezio Admin Dashboard
+# Prezio User Management
 
-A small full-stack assessment project built as a React single-page application with a Python FastAPI backend, SQLAlchemy, SQLite, and Docker Compose.
+A small React single-page application with a Python FastAPI backend, SQLAlchemy, SQLite, admin authentication, user management, CSV upload, and one-container Docker deployment.
 
 ## Features
 
-- Administrator registration and login
-- Password hashing and 30-minute JWT sessions
+- Administrator registration and login with frontend and backend validation
+- Argon2 password hashing and 30-minute JWT sessions
 - Protected dashboard and logout
-- Total, active, inactive, and last-30-days customer KPIs
-- Customer table with server-side search, status filtering, sorting, and pagination
-- Create, view, edit, and delete customer workflows
-- Customer activity history for create and update events
-- Responsive loading, error, and empty states
+- Total, active, inactive, and last-30-days user KPIs
+- Create, view, edit, and delete users
+- Client-side search and status filtering
+- CSV dataset upload
+- Responsive loading, success, error, and empty states
 - FastAPI Swagger documentation
-- Backend and frontend tests
 
 ## Architecture
 
 ```text
-React SPA :3000 → REST API → FastAPI :8000 → SQLAlchemy → SQLite
+Browser → React SPA → FastAPI REST API → SQLAlchemy → SQLite
 ```
 
-The database contains three small tables: `admins` for authentication, `customers` for dashboard data, and `customer_activity` for basic audit history. Sample customers are inserted only when the customer table is empty.
+The production Docker image builds React first and copies the compiled SPA into the FastAPI image. FastAPI serves both the UI and API from port 8000. The database has two tables: `admins` and `users`.
 
 ## Run with Docker
 
-Docker is the recommended setup. Node, Python, and SQLite do not need to be installed locally.
-
-```bash
-cp .env.example .env
-docker compose up --build
-```
-
-On Windows PowerShell, use:
-
 ```powershell
 Copy-Item .env.example .env
-docker compose up --build
+docker build -t prezio-admin .
+docker run --name prezio-admin -p 8000:8000 -v prezio_data:/app/data --env-file .env prezio-admin
 ```
 
 Open:
 
-- Frontend: http://localhost:3000
-- Backend: http://localhost:8000
+- Application: http://localhost:8000
 - Swagger: http://localhost:8000/docs
 - Health check: http://localhost:8000/health
 
-Register the first administrator through the UI, then sign in. The dashboard loads the seeded customer metrics and table through protected APIs.
+Stop and remove the container:
 
-To stop the application:
-
-```bash
-docker compose down
-```
-
-To also remove the persisted SQLite database:
-
-```bash
-docker compose down -v
+```powershell
+docker stop prezio-admin
+docker rm prezio-admin
 ```
 
 ## Local development
 
-Backend:
+Start the backend:
 
-```bash
+```powershell
 cd backend
 python -m venv .venv
-source .venv/bin/activate
+.\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-Frontend, in another terminal:
+Start the frontend in a second terminal:
 
-```bash
+```powershell
 cd frontend
 npm install
 npm run dev
 ```
 
-## Tests
+The local frontend runs at http://localhost:5173 and connects to the API at http://localhost:8000/api.
 
-```bash
-cd backend
-pytest -q
+## CSV upload
+
+Use `sample_users.csv` as a template. Its required header is:
+
+```csv
+name,email,company,status
 ```
 
-```bash
-cd frontend
-npm test
-```
+Status must be `active` or `inactive`. Duplicate emails and invalid rows are skipped, and the UI reports the imported and skipped counts.
 
 ## API endpoints
 
@@ -99,30 +82,23 @@ npm test
 | POST | `/api/auth/register` | Register an administrator |
 | POST | `/api/auth/login` | Validate credentials and return a JWT |
 | GET | `/api/auth/me` | Validate the current session |
-| GET | `/api/dashboard/stats` | Return the four customer KPIs |
-| GET | `/api/customers` | Search, filter, sort, and paginate customers |
-| GET | `/api/customers/{id}` | Return customer details |
-| POST | `/api/customers` | Create a customer |
-| PUT | `/api/customers/{id}` | Update a customer |
-| DELETE | `/api/customers/{id}` | Delete a customer |
-| GET | `/api/customers/{id}/activity` | Return customer activity history |
-
-## Design decisions
-
-- SQLite keeps the approved, time-boxed exercise easy to run. SQLAlchemy isolates database access so a later PostgreSQL change mainly requires a new database URL and migration setup.
-- The customer API applies pagination in SQL. React never downloads every record to paginate locally.
-- JWT keeps protected API calls simple and easy to demonstrate. For a public production application, the token would normally be held in a secure HTTP-only cookie.
-- The implementation uses small modules with direct names so each part is easy to explain during review.
+| GET | `/api/dashboard/stats` | Return user KPIs |
+| GET | `/api/users` | Return managed users |
+| GET | `/api/users/{id}` | Return one user |
+| POST | `/api/users` | Create a user |
+| PUT | `/api/users/{id}` | Update a user |
+| DELETE | `/api/users/{id}` | Delete a user |
+| POST | `/api/users/import` | Upload a CSV dataset |
 
 ## Project structure
 
 ```text
-frontend/src/components  Reusable UI pieces
-frontend/src/pages       Dashboard screen
-frontend/src/services    API integration
-backend/app/routers      Authentication, dashboard, and customer endpoints
-backend/app/models.py    SQLAlchemy tables
-backend/app/schemas.py   Pydantic request and response models
-backend/tests            Meaningful API tests
-architecture             System flow
+Dockerfile              Builds and serves the complete application
+frontend/src            React UI and API integration
+backend/app/routers     Authentication, dashboard, and user APIs
+backend/app/models.py   SQLAlchemy tables
+backend/app/schemas.py  Pydantic validation models
+sample_users.csv        Import template and sample dataset
 ```
+
+SQLite keeps the assessment easy to run. SQLAlchemy separates the database layer, so the application can later move to PostgreSQL through configuration and migrations. The implementation uses small modules and direct names so each part is easy to explain during the interview.

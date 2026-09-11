@@ -1,0 +1,19 @@
+.import-button {
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid #d9deea;
+  border-radius: 9px;
+  background: #fff;
+  color: #4d5669;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.success-notice {
+  margin-bottom: 16px;
+  padding: 11px 13px;
+  border-radius: 9px;
+  background: #e9f8f0;
+  color: #147547;
+  font-size: 0.87rem;
+}

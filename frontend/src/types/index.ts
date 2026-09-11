@@ -12,13 +12,13 @@ export type LoginResult = {
 }
 
 export type DashboardStats = {
-  total_customers: number
-  active_customers: number
-  inactive_customers: number
+  total_users: number
+  active_users: number
+  inactive_users: number
   added_last_30_days: number
 }
 
-export type Customer = {
+export type ManagedUser = {
   id: number
   name: string
   email: string
@@ -28,23 +28,11 @@ export type Customer = {
   updated_at: string
 }
 
-export type CustomerInput = Pick<Customer, 'name' | 'email' | 'company' | 'status'>
+export type UserInput = Pick<ManagedUser, 'name' | 'email' | 'company' | 'status'>
 
-export type CustomerActivity = {
-  id: number
-  customer_id: number
-  action: string
-  created_at: string
-  metadata: Record<string, string>
-}
-
-export type CustomerPage = {
-  items: Customer[]
+export type UserList = {
+  items: ManagedUser[]
   total: number
-  page: number
-  page_size: number
-  total_pages: number
 }
 
-export type SortField = 'id' | 'name' | 'company' | 'status' | 'created_at' | 'updated_at'
-export type SortOrder = 'asc' | 'desc'
+export type ImportResult = { imported: number; skipped: number }

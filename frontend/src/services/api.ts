@@ -1,13 +1,11 @@
 import type {
   Admin,
-  Customer,
-  CustomerActivity,
-  CustomerInput,
-  CustomerPage,
+  ImportResult,
+  ManagedUser,
   DashboardStats,
   LoginResult,
-  SortField,
-  SortOrder,
+  UserInput,
+  UserList,
 } from '../types'
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
@@ -16,7 +14,7 @@ async function request<T>(path: string, options: RequestInit = {}, token?: strin
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
@@ -49,38 +47,20 @@ export const api = {
 
   stats: (token: string) => request<DashboardStats>('/dashboard/stats', {}, token),
 
-  customers: (
-    token: string,
-    params: {
-      page: number
-      search: string
-      status: string
-      sortBy: SortField
-      sortOrder: SortOrder
-    },
-  ) => {
-    const query = new URLSearchParams({
-      page: String(params.page),
-      page_size: '10',
-      search: params.search,
-      sort_by: params.sortBy,
-      sort_order: params.sortOrder,
-    })
-    if (params.status) query.set('status', params.status)
-    return request<CustomerPage>(`/customers?${query}`, {}, token)
+  users: (token: string) => request<UserList>('/users', {}, token),
+
+  createUser: (token: string, user: UserInput) =>
+    request<ManagedUser>('/users', { method: 'POST', body: JSON.stringify(user) }, token),
+
+  updateUser: (token: string, id: number, user: UserInput) =>
+    request<ManagedUser>(`/users/${id}`, { method: 'PUT', body: JSON.stringify(user) }, token),
+
+  deleteUser: (token: string, id: number) =>
+    request<void>(`/users/${id}`, { method: 'DELETE' }, token),
+
+  importUsers: (token: string, file: File) => {
+    const form = new FormData()
+    form.append('file', file)
+    return request<ImportResult>('/users/import', { method: 'POST', body: form }, token)
   },
-
-  customer: (token: string, id: number) => request<Customer>(`/customers/${id}`, {}, token),
-
-  activity: (token: string, id: number) =>
-    request<CustomerActivity[]>(`/customers/${id}/activity`, {}, token),
-
-  createCustomer: (token: string, customer: CustomerInput) =>
-    request<Customer>('/customers', { method: 'POST', body: JSON.stringify(customer) }, token),
-
-  updateCustomer: (token: string, id: number, customer: CustomerInput) =>
-    request<Customer>(`/customers/${id}`, { method: 'PUT', body: JSON.stringify(customer) }, token),
-
-  deleteCustomer: (token: string, id: number) =>
-    request<void>(`/customers/${id}`, { method: 'DELETE' }, token),
 }

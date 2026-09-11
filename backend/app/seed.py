@@ -3,10 +3,10 @@ from datetime import datetime, timedelta
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from .models import Customer
+from .models import ManagedUser
 
 
-SAMPLE_CUSTOMERS = [
+SAMPLE_USERS = [
     ("Aarav Mehta", "aarav@novacore.in", "NovaCore", "active", 2),
     ("Diya Sharma", "diya@pixelcraft.in", "PixelCraft", "active", 5),
     ("Kabir Rao", "kabir@northstar.io", "NorthStar", "inactive", 9),
@@ -22,15 +22,15 @@ SAMPLE_CUSTOMERS = [
 ]
 
 
-def seed_customers(database: Session) -> None:
-    if database.scalar(select(func.count()).select_from(Customer)):
+def seed_users(database: Session) -> None:
+    if database.scalar(select(func.count()).select_from(ManagedUser)):
         return
 
     now = datetime.utcnow()
-    for name, email, company, status, days_ago in SAMPLE_CUSTOMERS:
+    for name, email, company, status, days_ago in SAMPLE_USERS:
         created_at = now - timedelta(days=days_ago)
         database.add(
-            Customer(
+            ManagedUser(
                 name=name,
                 email=email,
                 company=company,

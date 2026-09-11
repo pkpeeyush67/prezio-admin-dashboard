@@ -30,7 +30,7 @@ class LoginResponse(BaseModel):
     admin: AdminResponse
 
 
-class CustomerResponse(BaseModel):
+class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -42,37 +42,29 @@ class CustomerResponse(BaseModel):
     updated_at: datetime
 
 
-class CustomerCreate(BaseModel):
+class UserCreate(BaseModel):
     name: str = Field(min_length=2, max_length=100)
     email: EmailStr
     company: str = Field(min_length=2, max_length=150)
     status: Literal["active", "inactive"] = "active"
 
 
-class CustomerUpdate(CustomerCreate):
+class UserUpdate(UserCreate):
     pass
 
 
-class CustomerActivityResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    customer_id: int
-    action: str
-    created_at: datetime
-    metadata: dict = Field(validation_alias="activity_metadata")
-
-
-class CustomerListResponse(BaseModel):
-    items: list[CustomerResponse]
+class UserListResponse(BaseModel):
+    items: list[UserResponse]
     total: int
-    page: int
-    page_size: int
-    total_pages: int
 
 
 class DashboardStatsResponse(BaseModel):
-    total_customers: int
-    active_customers: int
-    inactive_customers: int
+    total_users: int
+    active_users: int
+    inactive_users: int
     added_last_30_days: int
+
+
+class ImportResult(BaseModel):
+    imported: int
+    skipped: int
